@@ -1,0 +1,59 @@
+# Default values for artipub-charts.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  artipub:
+    repository: tikazyq/artipub:latest
+    pullPolicy: IfNotPresent
+  mongo:
+    repository: mongo:latest
+    pullPolicy: IfNotPresent
+
+persistence:
+  init: true
+  claimName: artipub-mongo
+  storageClass: rook-ceph-block
+  accessMode: ReadWriteOnce
+  size: 8Gi
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name:
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+service:
+  type: ClusterIP
+  port: 8000
+
+ingress:
+  enabled: false
+  cert: true
+  host:
+    name: artipub.longguikeji.com
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    certmanager.k8s.io/cluster-issuer: letsencrypt-prod
+nodeSelector: {}
+

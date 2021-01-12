@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "artipub-charts.fullname" . }}
+  labels:
+    {{- include "artipub-charts.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "artipub-charts.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "artipub-charts.selectorLabels" . | nindent 8 }}
+    spec:
+    {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      serviceAccountName: {{ include "artipub-charts.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: "{{ .Release.Name }}-mongo"
+          image: "{{ .Values.image.mongo.repository }}"
+          imagePullPolicy: {{ .Values.image.mongo.pullPolicy }}
+          volumeMounts:
+            - name: artipub-data
+              mountPath: /data/db
+              subPath: mongodb
+        - name: "{{ .Release.Name }}-artipub"
+          image: "{{ .Values.image.artipub.repository }}"
+          env:
+            - name: MONGO_HOST
+              value: localhost
+            - name: ARTIPUB_API_ADDRESS
+              value: "http://localhost:3000"
+          imagePullPolicy: {{ .Values.image.artipub.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 8000
+              protocol: TCP
+      volumes:
+        - name: artipub-data
+          persistentVolumeClaim:
+            claimName: {{ .Values.persistence.claimName }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

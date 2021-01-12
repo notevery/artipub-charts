@@ -48,7 +48,7 @@ service:
   port: 8000
 
 ingress:
-  enabled: false
+  enabled: true
   cert: true
   host:
     name: artipub.longguikeji.com

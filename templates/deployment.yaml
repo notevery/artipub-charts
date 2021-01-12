@@ -35,11 +35,14 @@ spec:
             - name: MONGO_HOST
               value: localhost
             - name: ARTIPUB_API_ADDRESS
-              value: "http://localhost:3000"
+              value: "http://artipubapi.longguikeji.com"
           imagePullPolicy: {{ .Values.image.artipub.pullPolicy }}
           ports:
             - name: http
               containerPort: 8000
+              protocol: TCP
+            - name: back
+              containerPort: 3000
               protocol: TCP
       volumes:
         - name: artipub-data

@@ -1,7 +1,10 @@
 {{- if .Values.ingress.enabled -}}
 {{- $fullName := include "artipub-charts.fullname" . -}}
 {{- $svcPort := .Values.service.port -}}
+{{- $svcbackPort := .Values.service.backport -}}
+{{- $svcPort := .Values.service.port -}}
 {{- $domain := .Values.ingress.host.name -}}
+{{- $back := .Values.ingress.host.back -}}
 {{- if semverCompare ">=1.14-0" .Capabilities.KubeVersion.GitVersion -}}
 apiVersion: networking.k8s.io/v1beta1
 {{- else -}}
@@ -22,6 +25,9 @@ spec:
     - hosts:
       - {{ $domain }}
       secretName: {{ .Release.Name }}-crt
+    - hosts:
+      - {{ $back }}
+      secretName: {{ .Release.Name }}-crt-back
 {{- end }}
   rules:
     - host: {{ $domain }}
@@ -31,4 +37,11 @@ spec:
             backend:
               serviceName: {{ $fullName }}
               servicePort: {{ $svcPort }}
+    - host: {{ $back }}
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: {{ $fullName }}
+              servicePort: {{ $svcbackPort }}
 {{- end }}

@@ -11,5 +11,9 @@ spec:
       targetPort: http
       protocol: TCP
       name: http
+    - port: {{ .Values.service.backport }}
+      targetPort: back
+      protocol: TCP
+      name: back
   selector:
     {{- include "artipub-charts.selectorLabels" . | nindent 4 }}
